@@ -1,11 +1,13 @@
 package org.cleverdevtest.test.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.Builder;
 import lombok.Data;
 
 import java.time.LocalDateTime;
 
 @Data
+@Builder
 public class ClientNoteDto {
     private String comments;
     private String guid;

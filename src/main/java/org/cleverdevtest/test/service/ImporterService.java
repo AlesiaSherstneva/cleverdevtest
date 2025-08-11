@@ -19,6 +19,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -45,17 +46,23 @@ public class ImporterService {
         stats.reset();
 
         log.info("=== Import started ===");
+        log.info(LocalDateTime.now().toString());
 
-        List<ClientDto> oldClients = oldSystemClient.getAllClients();
+        try {
+            List<ClientDto> oldClients = oldSystemClient.getAllClients();
 
-        oldClients.forEach(client -> {
-            try {
-                processNotesList(client);
-            } catch (Exception ex) {
-                log.error("Import for client with guid {} failed. {}", client.getGuid(), ex.getMessage());
-                stats.errorOccurred();
-            }
-        });
+            oldClients.forEach(client -> {
+                try {
+                    processNotesList(client);
+                } catch (Exception ex) {
+                    log.error("Import for client with guid {} failed. {}", client.getGuid(), ex.getMessage());
+                    stats.errorOccurred();
+                }
+            });
+        } catch (Exception ex) {
+            log.error("Failed to connect to the old system: {}", ex.getMessage());
+            stats.errorOccurred();
+        }
 
         log.info("=== Import completed ===");
 
